@@ -1,3 +1,7 @@
+$PasswordProfile = New-Object -TypeName Microsoft.Open.AzureAD.Model.PasswordProfile
+$PasswordProfile.Password = ""
+New-AzureADUser -DisplayName "John Doe" -PasswordProfile $PasswordProfile -UserPrincipalName "john.doe@contoso.com" -AccountEnabled $true -MailNickName "john"
+
 New-AzADUser -DisplayName "John Doe" -UserPrincipalName john.doe@contoso.com
 New-AzADGroup -DisplayName "Contoso Admins" -MailNickname contoso-admins
 Get-AzADObject -SearchString "John Doe" | Select-Object -ExpandProperty Id
