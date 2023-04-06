@@ -1,0 +1,27 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "tenantId": {
+      "value": "DOE"
+    },
+    "subscriptionId": {
+      "value": "fc1a89fb-a3f7-4959-b325-efcd15bb63dc"
+    },
+    "storageAccountName": {
+      "value": "SA-DOE"
+    },
+    "sqlServerName": {
+      "value": "DOE-SQL-Server"
+    },
+    "sqlDatabaseName": {
+      "value": "DOE-SQL-DB"
+    },
+    "appServiceName": {
+      "value": "DOE-AppService"
+    },
+    "resourceGroupName": {
+      "value": "DOE-ResourceGroup"
+    }
+  }
+}
