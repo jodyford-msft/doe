@@ -1,118 +1,78 @@
-param tenantId string = '8b513086-bc43-4434-8925-1701a34c79f2' // your aad tenant ID
-param subscriptionId string = 'fc1a89fb-a3f7-4959-b325-efcd15bb63dc'
-param storageAccountName string ='SA-DOE'
-param sqlServerName string = 'DOE-SQL-Server'
-param sqlDatabaseName string = 'DOE-SQL-DB'
-param appServiceName string = 'DOE-AppService'
-param resourceGroupName string = 'DOE-ResourceGroup'
+param subscriptionId string = '6f0df019-2355-4c0a-9fe5-fe4f493f38a7'
 
-// Define a custom role for managing storage account keys
-resource storageAccountKeyRole 'Microsoft.Authorization/roleDefinitions@2022-04-01' = {
-  name: 'Storage Account Key Manager'
+targetScope = 'subscription'
+
+param storageAccountName string = 'SA-DOE'
+
+param sqlServerName string = 'DOE-SQL-Server'
+
+param sqlDatabaseName string = 'DOE-SQL-DB'
+
+param appServiceName string = 'DOE-AppService'
+
+param resourceGroupName string = 'RG-DataCenterOps-EastUS-IOE'
+
+param principalId string = '1eaa631b-0c7d-40cf-a1be-41cba507a2bb'
+
+resource contributorRoleDefinition 'Microsoft.Authorization/roleDefinitions@2022-04-01' existing = {
+
+  scope: subscription()
+
+  name: 'b24988ac-6180-42a0-ab88-20f7382dd24c'
+
+}
+
+resource roleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+
+  name: guid(resourceGroupName, principalId, contributorRoleDefinition.id)
+
   properties: {
-    roleName: 'Storage Account Key Manager'
-    description: 'Lets you manage the keys of a Storage Account.'
-    type: 'CustomRole'
-    assignableScopes: [
-      '/subscriptions/${subscriptionId}/resourceGroups/${resourceGroupName}/providers/Microsoft.Storage/storageAccounts/${storageAccountName}'
-    ]
-    permissions: [
-      {
-        actions: [
-          'Microsoft.Storage/storageAccounts/listKeys/action'
-          'Microsoft.Storage/storageAccounts/regenerateKey/action'
-        ]
-        notActions: []
-        dataActions: []
-        notDataActions: []
-      }
-    ]
+
+    roleDefinitionId: contributorRoleDefinition.id
+
+    principalId: principalId
+
+    principalType: 'User'
+
   }
+
+}
+
+resource sqlServerRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {\
+  name: guid('${sqlServerName}-Contributor-Role-Assignment', principalId, contributorRoleDefinition.id)
+  properties: {
+    principalId: principalId
+    roleDefinitionId: contributorRoleDefinition.id // Contributor role ID
+  }
+}
+
+// Define an assignment of the App Service Deployer role to a user or group
+
+resource appServiceDeployRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+ name: guid('${appServiceName}-deploy-role-assignment', principalId, contributorRoleDefinition.id)
+  properties: {
+    roleDefinitionId: contributorRoleDefinition.id
+    principalId: principalId // replace with the object ID of the user or group to assign the role to
+  }
+
 }
 
 // Define an assignment of the Storage Account Key Manager role to a user or group
-resource storageAccountKeyRoleAssignment 'Microsoft.Authorization/roleAssignments@2020-04-01-preview' = {
-  name: '${storageAccountName}-key-role-assignment'
+
+resource storageAccountKeyRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid('${storageAccountName}-key-role-assignment', principalId, contributorRoleDefinition.id)
   properties: {
-    roleDefinitionId: storageAccountKeyRole.id
-    principalId: 'e35703fc-6fdf-4753-b541-7f3dbd4f890d' // replace with the object ID of the user or group to assign the role to
-    //scope: storageAccountKeyRole.properties.assignableScopes[0]
+    roleDefinitionId: contributorRoleDefinition.id
+    principalId: principalId // replace with the object ID of the user or group to assign the role to
   }
+
 }
-
-// Define a custom role for managing SQL databases
-resource sqlDatabaseRole 'Microsoft.Authorization/roleDefinitions@2022-04-01' = {
-  name: 'SQL Database Manager'
-  properties: {
-    roleName: 'SQL Database Manager'
-    description: 'Lets you manage SQL databases.'
-    type: 'CustomRole'
-    assignableScopes: [
-      '/subscriptions/${subscriptionId}/resourceGroups/${resourceGroupName}/providers/Microsoft.Sql/servers/${sqlServerName}'
-    ]
-    permissions: [
-      {
-        actions: [
-          'Microsoft.Sql/servers/databases/read'
-          'Microsoft.Sql/servers/databases/write'
-          'Microsoft.Sql/servers/databases/delete'
-          'Microsoft.Sql/servers/databases/backup/action'
-        ]
-        notActions: []
-        dataActions: []
-        notDataActions: []
-      }
-    ]
-  }
-}
-
-// Define an assignment of the SQL Database Manager role to a user or group
-
-// copilot: define an assignment of the SQL Database Manager role to a user or group in bicep
-
-
-
 
 resource sqlDatabaseRoleAssignment 'Microsoft.Authorization/roleDefinitions@2022-04-01' = {
-  name: '${sqlDatabaseName}-db-role-assignment'
+  name: guid('${sqlDatabaseName}-db-role-assignment', principalId, contributorRoleDefinition.id)
   properties: {
-
-    //roleDefinitionId: sqlDatabaseRole.id
-    //principalId: 'e35703fc-6fdf-4753-b541-7f3dbd4f890d' // replace with the object ID of the user or group to assign the role to
-    //scope: sqlDatabaseRole.properties.assignableScopes[0]
+    roleName: contributorRoleDefinition.id // Contributor role ID}
   }
 }
 
-// Define a custom role for deploying code to an App Service
-resource appServiceDeployRole 'Microsoft.Authorization/roleDefinitions@2022-04-01' = {
-  name: 'App Service Deployer'
-  properties: {
-    roleName: 'App Service Deployer'
-    description: 'Lets you deploy code to an App Service.'
-    type: 'CustomRole'
-    assignableScopes: [
-      '/subscriptions/${subscriptionId}/resourceGroups/${resourceGroupName}/providers/Microsoft.Web/sites/${appServiceName}'
-    ]
-    permissions: [
-      {
-        actions: [
-          'Microsoft.Web/sites/restart/action'
-        ]
-        notActions: []
-        dataActions: []
-        notDataActions: []
-      }
-    ]}
-  }
-  
-  // Define an assignment of the App Service Deployer role to a user or group
-  resource appServiceDeployRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: '${appServiceName}-deploy-role-assignment'
-  properties: {
-  roleDefinitionId: appServiceDeployRole.id
-  principalId: 'e35703fc-6fdf-4753-b541-7f3dbd4f890d' // replace with the object ID of the user or group to assign the role to
-  //scope: appServiceDeployRole.properties.assignableScopes[0]
-  }
-  }
 
-  
