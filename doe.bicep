@@ -67,11 +67,18 @@ resource sqlDatabaseRole 'Microsoft.Authorization/roleDefinitions@2022-04-01' = 
 }
 
 // Define an assignment of the SQL Database Manager role to a user or group
+
+// copilot: define an assignment of the SQL Database Manager role to a user or group in bicep
+
+
+
+
 resource sqlDatabaseRoleAssignment 'Microsoft.Authorization/roleDefinitions@2022-04-01' = {
   name: '${sqlDatabaseName}-db-role-assignment'
   properties: {
-    roleDefinitionId: sqlDatabaseRole.id
-    principalId: 'e35703fc-6fdf-4753-b541-7f3dbd4f890d' // replace with the object ID of the user or group to assign the role to
+
+    //roleDefinitionId: sqlDatabaseRole.id
+    //principalId: 'e35703fc-6fdf-4753-b541-7f3dbd4f890d' // replace with the object ID of the user or group to assign the role to
     //scope: sqlDatabaseRole.properties.assignableScopes[0]
   }
 }

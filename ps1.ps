@@ -5,3 +5,4 @@ New-AzureADUser -DisplayName "John Doe" -PasswordProfile $PasswordProfile -UserP
 New-AzADUser -DisplayName "John Doe" -UserPrincipalName john.doe@contoso.com
 New-AzADGroup -DisplayName "Contoso Admins" -MailNickname contoso-admins
 Get-AzADObject -SearchString "John Doe" | Select-Object -ExpandProperty Id
+-
