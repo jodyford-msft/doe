@@ -38,7 +38,7 @@ resource roleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
 
 }
 
-resource sqlServerRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {\
+resource sqlServerRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
   name: guid('${sqlServerName}-Contributor-Role-Assignment', principalId, contributorRoleDefinition.id)
   properties: {
     principalId: principalId
